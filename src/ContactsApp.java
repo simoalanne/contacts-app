@@ -1,266 +1,106 @@
-import java.util.ArrayList;
 import java.io.Console;
 
-class ContactsApp {
+/**
+ * The main class for the ContactsApp application.
+ * This class manages the execution of the ContactsApp.
+ */
+public class ContactsApp {
+    /** The console object for reading user input. */
     private static Console c = System.console();
-    private static ArrayList<Person> contacts = new ArrayList<>();
-    private static String fileName = "savedContacts.ser";
 
-    public static void main(String[] args) {
-        ContactSerializer.loadContactsFromfile(fileName);
+    /** A flag indicating whether the application is running. */
+    private static boolean appRunning = true;
+
+    /**
+     * The main entry point for the ContactsApp application.
+     * Invokes methods within the class and in other classes to
+     * load, manage, and save contacts. Contacts are loaded if available,
+     * then managed, and finally, saved to a file if there are any.
+     *
+     * @param args The command line arguments (not used in this application).
+     * @author Simo Alanne
+     */
+    public static void main(final String[] args) {
+        ContactsSerializer.loadContactsFromFile();
         manageContacts();
-        ContactSerializer.saveContactsToFile(fileName);
+        ContactsSerializer.saveContactsToFile();
     }
-
+    /**
+     * Manages the contacts app by providing a Command Line Interface (CLI)
+     * that depends on contacts amount.
+     * If there are no contacts the simplified CLI is chosen.
+     * If at least one contact exists then the full CLI is chosen.
+     */
     public static void manageContacts() {
-        boolean appRunning = true;
-
-        while(appRunning) {
-            System.out.println(
-            "What would you like to do?\n" +
-            "Type 1 to create a new contact\n" +
-            "Type 2 to read all the currently saved contacts.\n" +
-            "Type 3 to update specific part or all parts on an existing contact\n" +
-            "Type 4 to delete an existing contact\n" +
-            "Type 5 to delete all contacts\n" +
-            "Type 6 to save and exit the program"
-            );
-
-            switch (c.readLine()) {
-                case "1":
-                    createNewContact();
-                    break;
-                case "2":
-                    readContacts();
-                    break;
-                case "3":
-                    updateContact(checkForSsn());
-                    break;
-                case "4":
-                    deleteContact(checkForSsn());
-                    break;
-                case "5":
-                    deleteAllContacts();
-                    break;
-                case "6":
-                    appRunning = false;
-                    break;
-                default:
-                    System.out.println("Enter a valid choise (1-5)");
+        System.out.println("Hello and welcome to the contacts app!");
+        while (appRunning) {
+            if (ContactsManager.getContacts().isEmpty()) {
+                System.out.println("No contacts available.");
+                menuWithoutContacts();
+            } else {
+                menuWithContacts();
             }
         }
     }
 
-    public static void createNewContact() {
-        Person person = new Person();
-        do {
-            try {
-                boolean contactExists = false;
-                System.out.println("Enter a Finnish social security number:");
-                String ssn = c.readLine();
-
-                for (Person contact : contacts) {
-                    if (ssn.equals(contact.getSsn())) {
-                        System.out.println("Contact with this SSN already exists");
-                        contactExists = true;
-                        break;
-                    }
-                }
-
-                if (!contactExists) {
-                    person.setSsn(ssn);
-                    updateAllInformation(person);
-                    contacts.add(person);
-                    break;
-                }
-
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
-        } while (true);
-    }
-
-    public static void updateContact(Person person) {
-        if (person == null) {
-            System.out.println("No person found with this ssn. Please search with a valid ssn.");
-            return;
-        }
-
+    /**
+     * Displays the main menu when at least one contact is available.
+     * It provides options to create, read, update and
+     * delete contacts, and to save and exit the program.
+     */
+    public static void menuWithContacts() {
         System.out.println(
-        "Type 1 to update first name\n" +
-        "Type 2 to update last name\n" +
-        "Type 3 to update phone number\n" +
-        "Type 4 to update address\n" +
-        "Type 5 to update email address\n" +
-        "Type 6 to update all of the above\n" +
-        "Type 7 to go back to previous selection. Your changes will be saved."
+            "What would you like to do?\n"
+            + "Type 1 to create a new contact\n"
+            + "Type 2 to read contacts\n"
+            + "Type 3 to edit contacts\n"
+            + "Type 4 to delete contacts\n"
+            + "Type 5 to save and exit the program"
         );
 
-        switch (c.readLine().toLowerCase()) {
-            case "1" :
-                updateFirstName(person);
+        switch (c.readLine()) {
+            case "1":
+                ContactsManager.createNewContact();
                 break;
-            case "2" :
-                updateLastName(person);
+            case "2":
+                ContactsManager.readContacts();
                 break;
             case "3":
-                updatePhoneNumber(person);
+                ContactsManager.updateContact(ContactsManager.checkForSsn());
                 break;
             case "4":
-                updateAddress(person);
+                ContactsManager.deleteContacts();
                 break;
             case "5":
-                updateEmailAddress(person);
+                appRunning = false;
                 break;
-            case "6" :
-                updateAllInformation(person);
-                break;
-            case "7" :
-                System.out.println("Changes saved succesfully");
-                return;
-            default :
-                System.out.println("Enter a valid choise (1-7)");
+            default:
+                System.out.println("Invalid choice");
         }
     }
 
-    public static void updateFirstName(Person person) {
-        do {
-            try {
-            System.out.println("Enter first name:");
-            person.setFirstName(c.readLine());
-            break;
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
-        } while (true);
-    }
-
-    public static void updateLastName(Person person) {
-        do {
-            try {
-            System.out.println("Enter last name:");
-            person.setLastName(c.readLine());
-            break;
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
-        } while (true);
-    }
-
-    public static void updatePhoneNumber(Person person) {
-        do {
-            try {
-            System.out.println("Enter a valid phone number either with or without country code");
-            person.setPhoneNumber(c.readLine());
-            break;
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
-        } while (true);
-    }
-
-    public static void updateAddress(Person person) {
-        do {
-            try {
-            System.out.println("Enter address: (optional)");
-            person.setAddress(c.readLine());
-            break;
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
-        } while (true);
-    }
-
-    public static void updateEmailAddress(Person person) {
-        do {
-            try {
-            System.out.println("Enter email address: (optional)");
-            person.setEmailAddress(c.readLine().toLowerCase());
-            break;
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
-        } while (true);
-        System.out.println("Contact saved succesfully");
-    }
-
-    public static void updateAllInformation(Person person) {
-        updateFirstName(person);
-        updateLastName(person);
-        updatePhoneNumber(person);
-        updateAddress(person);
-        updateEmailAddress(person);
-        return;
-    }
-
-    public static void deleteContact(Person person) {
-        if (person == null) {
-            System.out.println("No contact found with this ssn");
-            return;
-        }
-        contacts.remove(person);
-        System.out.println("Contact deleted succesfully");
-    }
-
-    public static void deleteAllContacts() {
-        if (person == null) {
-            System.out.println("Nothing to delete");
-        }
+    /**
+     * Displays the main menu when no contacts are available.
+     * It provides options to create a new contact
+     * and to save and exit the program.
+     */
+    public static void menuWithoutContacts() {
         System.out.println(
-        "Are you absolutely sure that you want to delete all the contacts?\n" +
-        "This operation is irreversible\n" +
-        "Type yes to proceed or no to cancel"
+            "What would you like to do?\n"
+            + "Type 1 to create a new contact\n"
+            + "Type 2 to save and exit the program"
         );
 
-        while (true) {
-            switch (c.readLine().toLowerCase()) {
-                case "yes" :
-                    contacts.clear();
-                    System.out.println("All contacts deleted succefully");
-                    return;
-                case "no" :
-                    System.out.println("Nothing deleted");
-                    return;
-                default :
-                    System.out.println("Type yes or no");
-            }
+        switch (c.readLine()) {
+            case "1":
+                ContactsManager.createNewContact();
+                break;
+            case "2":
+                appRunning = false;
+                System.out.println("Exiting program...");
+                break;
+            default:
+                System.out.println("Invalid choice");
         }
-    }
-
-    public static void readContacts() {
-        if (contacts.isEmpty()) {
-            System.out.println("No contacts to read!");
-            return;
-        }
-
-        System.out.println("Contacts:");
-        for (Person contact : contacts) {
-            System.out.println(contact);
-            System.out.println();
-        }
-    }
-
-    public static Person checkForSsn() {
-
-        if (contacts.isEmpty()) {
-            System.out.println("There are currently no saved contacts. Please create a contact first.");
-        }
-
-        System.out.println("Enter the social security number of the contact you wish to modify");
-        String findSsn = c.readLine();
-        for (Person contact: contacts) {
-            if (contact.getSsn().equals(findSsn)) {
-                return contact;
-            }
-        }
-        return null;
-    }
-
-    public static ArrayList<Person> getContacts() {
-        return contacts;
-    }
-
-    public static int getContactsSize() {
-        return contacts.size();
     }
 }
