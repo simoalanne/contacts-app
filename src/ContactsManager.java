@@ -13,8 +13,8 @@ public class ContactsManager {
 
     /**
      * Creates a new contact by creating a new Person object.
-     * Sets the social security number of the contact and invokes
-     * a second method to set rest of the details.
+     * Sets the social security number of the contact and then invokes
+     * a second method to set the rest of the details.
      */
     public static void createNewContact() {
         Person person = new Person();
@@ -184,7 +184,7 @@ public class ContactsManager {
     }
 
     /**
-     * Updates all detauls except the social security
+     * Updates all details except the social security
      * number of the specified contact.
      *
      * @param person The contact to be updated.

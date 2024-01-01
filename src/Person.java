@@ -45,7 +45,7 @@ public class Person implements Serializable {
                     + "and 'A-' the century ('A' for 1900 or '-' for 2000).\n"
                     + "'xxx' is 3 digits between 002-899 and 'c' is\n"
                     + "the control character. Example of a valid\n"
-                    + "social security number: 010203A456R"
+                    + "social security number: 010203A456R."
                 );
             }
 

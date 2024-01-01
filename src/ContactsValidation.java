@@ -54,7 +54,7 @@ public class ContactsValidation {
      * 9 or 8 numbers from the string (social security number) with the
      * amount of possible control characters and counting the modulo
      * of that operation. If the control character in the social
-     * security number matches the control character of algorithm
+     * security number matches the control character of the algorithm
      * then the ssn is valid.
      *
      * Note that this method should be used in combination with the

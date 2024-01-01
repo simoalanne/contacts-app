@@ -10,8 +10,8 @@ import java.io.ObjectOutputStream;
  * A utility class for serializing and
  * deserializing contacts to and from a file.
  * This class provides methods to load contacts from
- * a serialized file into the ContactsManager and saves
- * contacts from the ContactsManager to a serialized file.
+ * a serialized file into the ContactsManager and to save
+ * contacts from the ContactsManager into a serialized file.
  */
 public class ContactsSerializer {
     /** The default file name for saving and loading contacts. */
@@ -21,8 +21,8 @@ public class ContactsSerializer {
     private static File file = new File(fileName);
 
     /**
-     * If file exits, this method loads contacts from the serialized file
-     * and adds them to the ContactsManager. If the exists but is
+     * If the file exits, this method loads contacts from the serialized file
+     * and adds them to the ContactsManager. If the file exists but is
      * corrupted, it attemps to delete the file and exits the program.
      */
     public static void loadContactsFromFile() {
